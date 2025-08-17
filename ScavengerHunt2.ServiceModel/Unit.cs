@@ -1,4 +1,5 @@
-﻿using ServiceStack;
+﻿using ScavengerHunt2.ServiceModel;
+using ServiceStack;
 using ServiceStack.DataAnnotations;
 using System.Collections.Generic;
 
