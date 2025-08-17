@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cub Scout QR Adventure</title>
+  <style>
+    :root{
+      --bg:#f4f1e8;
+      --card:#fffaf0;
+      --muted:#5c5c4c;
+      --text:#2c2c1c;
+      --accent:#2c5e1a;
+      --accent-2:#e67e22;
+      --good:#ffcc00;
+      --warn:#e67e22;
+      --danger:#b22222;
+      --radius:16px;
+      --shadow:0 6px 20px rgba(0,0,0,.15);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:'Trebuchet MS', Verdana, sans-serif}
+    a{color:inherit;text-decoration:none}
+    .container{width:min(1100px, 92%);margin-inline:auto}
+    header{position:sticky;top:0;backdrop-filter:blur(8px);background:rgba(244,241,232,.9);z-index:10;border-bottom:2px solid var(--accent)}
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+    .brand{display:flex;align-items:center;gap:.75rem;font-weight:800;font-size:1.2rem;color:var(--accent)}
+    .brand .logo{width:38px;height:38px;display:grid;place-items:center;border-radius:50%;background:var(--accent-2);color:#fff;font-weight:900}
+    .nav a.btn{padding:.6rem 1rem;border-radius:999px;background:var(--accent);color:#fff;font-weight:700;box-shadow:var(--shadow)}
+
+    .hero{display:grid;grid-template-columns:1fr;gap:20px;align-items:center;padding:40px 0;text-align:center}
+    .hero h1{font-size:clamp(2rem, 3vw + 1rem, 3.2rem);margin:.2rem 0 1rem;color:var(--accent)}
+    .hero p{color:var(--muted);max-width:60ch;margin:auto}
+    .cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:20px}
+    .btn{padding:12px 18px;border-radius:14px;border:none;background:var(--accent-2);color:#fff;font-weight:700;cursor:pointer}
+    .btn.primary{background:var(--accent)}
+    .btn.ghost{background:#fff;border:2px solid var(--accent);color:var(--accent)}
+
+    #qr-reader{margin:20px auto;max-width:320px;border:4px solid var(--accent);border-radius:var(--radius);}
+    #qr-result{text-align:center;margin-top:12px;font-weight:bold;color:var(--accent-2)}
+
+    section{padding:32px 0}
+    h2{font-size:1.8rem;margin:0 0 14px;color:var(--accent)}
+    .sub{color:var(--muted);margin:0 0 18px}
+
+    .grid{display:grid;gap:18px}
+    .grid.cols-2{grid-template-columns:repeat(2, minmax(0,1fr))}
+    .card{border-radius:var(--radius);background:var(--card);border:2px solid var(--accent);padding:18px;box-shadow:var(--shadow)}
+
+    .lb-item{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:12px;background:#fff;border:1px solid var(--accent)}
+    .user{display:flex;align-items:center;gap:10px}
+    .avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--accent-2);color:#fff;font-weight:900}
+
+    footer{padding:30px 0 50px;color:var(--muted);text-align:center;font-size:.9rem}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <div class="logo">⛺</div>
+        <span>Cub Scout QR Adventure</span>
+      </div>
+      <nav style="display:flex;align-items:center;gap:12px">
+        <a href="#how" class="btn ghost">How it works</a>
+        <a href="#leaderboard" class="btn">Leaderboard</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero container">
+      <div>
+        <h1>Begin Your Adventure</h1>
+        <p>Scan QR caches hidden around camp and earn points for your Den or Pack. Collect badges as you explore and see how your unit stacks up!</p>
+        <div class="cta">
+          <button class="btn primary">🎯 Start Playing</button>
+        </div>
+      </div>
+      
+      <div id="qr-reader"></div>
+      <div id="qr-result"></div>
+    </section>
+
+    <section id="leaderboard" class="container">
+      <h2>Leaderboard</h2>
+      <p class="sub">See which Scouts, Units, Dens, and Packs are leading the adventure.</p>
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>Top Scouts</h3>
+          <div class="lb-item"><div class="user"><div class="avatar">1</div><strong>Aiden W.</strong></div><div>🏅 120 pts</div></div>
+          <div class="lb-item"><div class="user"><div class="avatar">2</div><strong>Ella T.</strong></div><div>🥈 110 pts</div></div>
+          <div class="lb-item"><div class="user"><div class="avatar">3</div><strong>Jacob M.</strong></div><div>🥉 100 pts</div></div>
+        </div>
+
+        <div class="card">
+          <h3>Top Units</h3>
+          <div class="lb-item"><div class="user"><div class="avatar">P</div><strong>Pack 541</strong></div><div>🔥 520 pts</div></div>
+          <div class="lb-item"><div class="user"><div class="avatar">P</div><strong>Pack 212</strong></div><div> 410 pts</div></div>
+          <div class="lb-item"><div class="user"><div class="avatar">P</div><strong>Pack 118</strong></div><div> 390 pts</div></div>
+        </div>
+
+        <div class="card">
+          <h3>Top Dens</h3>
+          <div class="lb-item"><div class="user"><strong>Wolf Den 1</strong></div><div>210 pts</div></div>
+          <div class="lb-item"><div class="user"><strong>Bear Den 1</strong></div><div>190 pts</div></div>
+          <div class="lb-item"><div class="user"><strong>Tiger Den 2</strong></div><div>180 pts</div></div>
+        </div>
+
+        <div class="card">
+          <h3>Top Packs</h3>
+          <div class="lb-item"><div class="user"><strong>Pack 541</strong></div><div>520 pts</div></div>
+          <div class="lb-item"><div class="user"><strong>Pack 212</strong></div><div>410 pts</div></div>
+          <div class="lb-item"><div class="user"><strong>Pack 118</strong></div><div>390 pts</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="how" class="container">
+      <h2>How to Play</h2>
+      <p class="sub">Find QR codes around camp, scan them, and earn points. Each scan goes toward your total and your unit's score!</p>
+      <div class="grid cols-2">
+        <div class="card">🗺️ Find a cache hidden at camp</div>
+        <div class="card">📱 Scan the QR code to log your find</div>
+        <div class="card">🏆 Earn points & badges</div>
+        <div class="card">👥 Compete with your Den and Pack</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© <span id="year"></span> Cub Scout QR Adventure • Built for Scouting Fun</p>
+  </footer>
+
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const scouterId = "demo-scouter-id";
+    const apiBase = "/api/caches";
+
+    function onScanSuccess(decodedText, decodedResult) {
+      document.getElementById("qr-result").innerText = `Scanned: ${decodedText}`;
+      const qrCodeId = decodedText;
+      navigator.geolocation.getCurrentPosition((pos) => {
+        fetch(`${apiBase}/find`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            qrCodeId,
+            scouterId,
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude
+          })
+        })
+        .then(res => res.json())
+        .then(data => alert(`🎉 You found ${data.name}! +${data.basePoints} pts`))
+        .catch(err => console.error(err));
+      });
+    }
+
+    let html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: 250 });
+    html5QrcodeScanner.render(onScanSuccess);
+  </script>
+</body>
+</html>

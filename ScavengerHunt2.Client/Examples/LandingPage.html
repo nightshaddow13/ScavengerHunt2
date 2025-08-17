@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QR Cache — Find. Scan. Conquer.</title>
+  <style>
+    :root{
+      --bg:#0b0f19;            /* deep navy */
+      --card:#12182a;          /* slightly lighter */
+      --muted:#a6b0cf;         /* muted text */
+      --text:#e6ecff;          /* bright text */
+      --accent:#7c5cff;        /* purple */
+      --accent-2:#4de1ff;      /* cyan */
+      --good:#4cff99;
+      --warn:#ffcc66;
+      --danger:#ff6b6b;
+      --radius:18px;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;background:radial-gradient(1200px 800px at 85% -10%, rgba(124,92,255,.25), transparent 60%),
+                                            radial-gradient(900px 600px at 10% 10%, rgba(77,225,255,.18), transparent 60%),
+                                            var(--bg);color:var(--text);font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"}
+    a{color:inherit;text-decoration:none}
+    .container{width:min(1100px, 92%);margin-inline:auto}
+
+    /* Header */
+    header{position:sticky;top:0;backdrop-filter:blur(8px);background:linear-gradient(180deg, rgba(11,15,25,.85), rgba(11,15,25,.35) 60%, transparent);z-index:10}
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+    .brand{display:flex;align-items:center;gap:.75rem;font-weight:800;letter-spacing:.3px}
+    .brand .logo{width:38px;height:38px;display:grid;place-items:center;border-radius:10px;background:conic-gradient(from 180deg at 50% 50%, var(--accent), var(--accent-2), var(--accent));box-shadow:0 6px 18px rgba(124,92,255,.35)}
+    .nav a.btn{padding:.7rem 1rem;border-radius:999px;background:linear-gradient(90deg, var(--accent), var(--accent-2));color:#08111a;font-weight:700;box-shadow:var(--shadow)}
+
+    /* Hero */
+    .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center;padding:48px 0 34px}
+    .hero h1{font-size:clamp(2rem, 3.4vw + 1rem, 4rem);line-height:1.04;margin:.2rem 0 1rem}
+    .hero p{color:var(--muted);max-width:55ch}
+    .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+    .btn{display:inline-flex;align-items:center;gap:.6rem;padding:14px 18px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));color:var(--text);font-weight:700}
+    .btn.primary{background:linear-gradient(90deg, var(--accent), var(--accent-2));color:#0a0f18;border-color:transparent}
+    .btn.ghost{background:transparent}
+    .chip{display:inline-flex;align-items:center;gap:.5rem;background:rgba(124,92,255,.15);border:1px solid rgba(124,92,255,.35);padding:6px 10px;border-radius:999px;color:#dcd6ff;font-weight:700;font-size:.85rem}
+
+    .hero-card{position:relative;border-radius:var(--radius);background:linear-gradient(160deg, rgba(124,92,255,.2), rgba(77,225,255,.1) 40%, rgba(255,255,255,.04) 60%), var(--card);padding:22px;border:1px solid rgba(255,255,255,.08);box-shadow:var(--shadow);overflow:hidden}
+    .glow{position:absolute;inset:auto -20% -30% -20%;height:60%;background:radial-gradient(50% 90% at 50% 100%, rgba(124,92,255,.35), transparent 60%);filter:blur(30px);opacity:.6;pointer-events:none}
+    .screen{border-radius:14px;background:#060912;border:1px solid rgba(255,255,255,.08);padding:16px}
+    .screen .title{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .qr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .qr .tile{aspect-ratio:1;border-radius:12px;background:
+      conic-gradient(from 90deg at 50% 50%, rgba(124,92,255,.35), rgba(77,225,255,.35), rgba(124,92,255,.35));
+      display:grid;place-items:center;padding:8px}
+    .qr svg{width:72%;height:auto}
+
+    /* Sections */
+    section{padding:32px 0}
+    h2{font-size:clamp(1.3rem,1.2vw + 1rem,2rem);margin:0 0 14px}
+    .sub{color:var(--muted);margin:0 0 18px}
+
+    .grid{display:grid;gap:18px}
+    .grid.cols-3{grid-template-columns:repeat(3, minmax(0,1fr))}
+    .card{border-radius:var(--radius);background:var(--card);border:1px solid rgba(255,255,255,.08);padding:18px;box-shadow:var(--shadow)}
+
+    .how-step{display:flex;align-items:flex-start;gap:12px}
+    .how-step .icon{font-size:1.4rem}
+
+    /* Leaderboard */
+    .lb-item{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+    .user{display:flex;align-items:center;gap:10px}
+    .avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg, var(--accent), var(--accent-2));color:#061018;font-weight:900}
+    .medal{font-size:1.1rem}
+
+    /* Badges */
+    .badges{display:flex;flex-wrap:wrap;gap:10px}
+    .badge{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:999px;border:1px dashed rgba(255,255,255,.16);background:rgba(255,255,255,.04)}
+    .badge .dot{width:10px;height:10px;border-radius:50%}
+
+    /* Sticky Mobile Scan Bar */
+    .scan-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:20;width:min(680px, 92%);display:none}
+    .scan-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:.6rem;border-radius:999px;padding:16px;border:none;font-weight:800;color:#071018;cursor:pointer;background:linear-gradient(90deg, var(--accent), var(--accent-2));box-shadow:0 12px 30px rgba(77,225,255,.25)}
+
+    footer{padding:44px 0 80px;color:var(--muted)}
+    .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:18px}
+
+    /* Responsive */
+    @media (max-width: 900px){
+      .hero{grid-template-columns:1fr;gap:20px;padding-top:24px}
+      .grid.cols-3{grid-template-columns:1fr}
+      .footer-grid{grid-template-columns:1fr}
+      .scan-bar{display:block}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">🔳</div>
+        <span>QR Cache</span>
+      </div>
+      <nav style="display:flex;align-items:center;gap:12px">
+        <a href="#how" class="btn ghost" aria-label="How it works">How it works</a>
+        <a href="#play" class="btn" aria-label="Sign in">Sign in</a>
+        <a href="#play" class="btn primary" aria-label="Start playing">Start Playing</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero container">
+      <div>
+        <span class="chip">🎮 The QR Scavenger Hunt Game</span>
+        <h1>Find. Scan. <span style="background:linear-gradient(90deg, var(--accent), var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent">Conquer.</span></h1>
+        <p>Hunt down real‑world QR caches, scan to unlock loot, and race friends up the leaderboard. Earn badges, streaks, and rare drops as you explore your city.</p>
+        <div class="cta">
+          <a class="btn primary" href="#play">▶ Press Start</a>
+          <a class="btn" href="#scan">📷 Scan a QR</a>
+          <a class="btn ghost" href="#leaderboard">🏆 View Leaderboard</a>
+        </div>
+      </div>
+
+      <div class="hero-card" aria-label="App preview">
+        <div class="glow" aria-hidden="true"></div>
+        <div class="screen">
+          <div class="title">
+            <strong>Nearby Caches</strong>
+            <span style="color:var(--muted);font-size:.9rem">3 online</span>
+          </div>
+          <div class="qr">
+            <!-- four stylized QR tiles -->
+            <div class="tile" title="Cache #047">
+              <svg viewBox="0 0 100 100" role="img" aria-label="QR tile"><rect width="100" height="100" rx="8" fill="rgba(0,0,0,.45)"/><rect x="8" y="8" width="24" height="24" fill="white"/><rect x="68" y="8" width="24" height="24" fill="white"/><rect x="8" y="68" width="24" height="24" fill="white"/><rect x="38" y="38" width="24" height="24" fill="white"/></svg>
+            </div>
+            <div class="tile" title="Cache #112">
+              <svg viewBox="0 0 100 100" role="img" aria-label="QR tile"><rect width="100" height="100" rx="8" fill="rgba(0,0,0,.45)"/><rect x="8" y="8" width="24" height="24" fill="white"/><rect x="38" y="38" width="24" height="24" fill="white"/><rect x="68" y="68" width="24" height="24" fill="white"/><rect x="8" y="68" width="24" height="24" fill="white"/></svg>
+            </div>
+            <div class="tile" title="Cache #219">
+              <svg viewBox="0 0 100 100" role="img" aria-label="QR tile"><rect width="100" height="100" rx="8" fill="rgba(0,0,0,.45)"/><rect x="68" y="8" width="24" height="24" fill="white"/><rect x="38" y="38" width="24" height="24" fill="white"/><rect x="8" y="68" width="24" height="24" fill="white"/><rect x="68" y="68" width="24" height="24" fill="white"/></svg>
+            </div>
+            <div class="tile" title="Cache #305">
+              <svg viewBox="0 0 100 100" role="img" aria-label="QR tile"><rect width="100" height="100" rx="8" fill="rgba(0,0,0,.45)"/><rect x="8" y="8" width="24" height="24" fill="white"/><rect x="68" y="8" width="24" height="24" fill="white"/><rect x="38" y="38" width="24" height="24" fill="white"/><rect x="68" y="68" width="24" height="24" fill="white"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="leaderboard" class="container">
+      <h2>Top Explorers This Week</h2>
+      <p class="sub">Earn points by finding caches, maintain streaks, and unlock rare badges to climb the ranks.</p>
+      <div class="grid">
+        <div class="card">
+          <div class="lb-item">
+            <div class="user"><div class="avatar" aria-hidden="true">1</div><strong>CacheCrusher</strong></div>
+            <div><span class="medal">🥇</span> 3,420 pts</div>
+          </div>
+          <div class="lb-item" style="margin-top:10px">
+            <div class="user"><div class="avatar">2</div><strong>ScanMan</strong></div>
+            <div><span class="medal">🥈</span> 2,980 pts</div>
+          </div>
+          <div class="lb-item" style="margin-top:10px">
+            <div class="user"><div class="avatar">3</div><strong>QRQueen</strong></div>
+            <div><span class="medal">🥉</span> 2,720 pts</div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="margin:0 0 10px">Weekly Challenges</h3>
+          <ul style="margin:0;padding-left:1rem;line-height:1.8">
+            <li>🔥 <strong>Hot Streak:</strong> Scan 3 caches in 24 hours (+200)</li>
+            <li>🌍 <strong>Neighborhood Hop:</strong> Find caches in 3 areas (+150)</li>
+            <li>🕵️ <strong>Secret Drop:</strong> Solve a clue cache (+300)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 style="margin:0 0 10px">Your Progress</h3>
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden">
+            <div style="height:12px;background:linear-gradient(90deg, var(--accent), var(--accent-2));width:46%"></div>
+          </div>
+          <p class="sub" style="margin-top:10px">Level 3 • 460 / 1000 XP to Level 4</p>
+          <div class="badges">
+            <div class="badge"><span class="dot" style="background:var(--good)"></span> Eagle Eye</div>
+            <div class="badge"><span class="dot" style="background:var(--warn)"></span> City Sprinter</div>
+            <div class="badge"><span class="dot" style="background:var(--accent-2)"></span> Night Owl</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="how" class="container">
+      <h2>How to Play</h2>
+      <p class="sub">Simple rules, endless adventure. Grab a friend and start scanning.</p>
+      <div class="grid cols-3">
+        <div class="card how-step">
+          <div class="icon" aria-hidden="true">🗺️</div>
+          <div>
+            <h3 style="margin:0">Find a QR Cache</h3>
+            <p class="sub" style="margin:.2rem 0 0">Look for stickers, signs, or plaques with the QR Cache mark.</p>
+          </div>
+        </div>
+        <div class="card how-step">
+          <div class="icon" aria-hidden="true">📱</div>
+          <div>
+            <h3 style="margin:0">Scan to Unlock</h3>
+            <p class="sub" style="margin:.2rem 0 0">Reveal the cache page, loot, and clues to the next find.</p>
+          </div>
+        </div>
+        <div class="card how-step">
+          <div class="icon" aria-hidden="true">🏆</div>
+          <div>
+            <h3 style="margin:0">Score & Compete</h3>
+            <p class="sub" style="margin:.2rem 0 0">Rack up points, badges, and streaks to climb the leaderboard.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="play" class="container">
+      <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+        <div>
+          <h2 style="margin:0 0 6px">Ready to play?</h2>
+          <p class="sub" style="margin:0">Sign in to save your progress and challenge friends.</p>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a class="btn primary" href="#">Continue with Google</a>
+          <a class="btn" href="#">Continue with Apple</a>
+          <a class="btn ghost" href="#">Use Email</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-grid">
+      <div>
+        <strong>QR Cache</strong>
+        <p class="sub">A city‑wide scavenger hunt where the world is your game board.</p>
+      </div>
+      <div>
+        <p><a href="#">Rules</a></p>
+        <p><a href="#">Privacy</a></p>
+        <p><a href="#">Support</a></p>
+      </div>
+      <div>
+        <p>© <span id="year"></span> QR Cache</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Sticky mobile scan bar -->
+  <div class="scan-bar">
+    <button class="scan-btn" aria-label="Scan a QR code">
+      📷 Scan a QR to Start
+    </button>
+  </div>
+
+  <script>
+    // Set year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Simple press start micro-interaction
+    document.querySelectorAll('a,button').forEach(el=>{
+      el.addEventListener('click',()=>{
+        el.animate([
+          { transform:'scale(1)', filter:'brightness(1)'},
+          { transform:'scale(.98)', filter:'brightness(.96)'},
+          { transform:'scale(1)', filter:'brightness(1)'}
+        ],{duration:220, easing:'cubic-bezier(.2,.9,.2,1)'});
+      })
+    })
+  </script>
+</body>
+</html>
