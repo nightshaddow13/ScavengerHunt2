@@ -58,31 +58,6 @@ export default function QrCacheGame() {
 	return (
 		<Layout title="Cub Scout QR Adventure">
 			<div className="bg-[#f4f1e8] text-[#2c2c1c] min-h-screen font-sans">
-				<header className="sticky top-0 bg-[rgba(244,241,232,0.9)] backdrop-blur-md z-10 border-b-2 border-[#2c5e1a]">
-					<div className="container mx-auto flex justify-between items-center p-4">
-						<div className="flex items-center gap-3 font-bold text-[#2c5e1a]">
-							<div className="w-10 h-10 grid place-items-center rounded-full bg-[#e67e22] text-white font-black">
-								⛺
-							</div>
-							Cub Scout QR Adventure
-						</div>
-						<nav className="flex items-center gap-3">
-							<a
-								href="#how"
-								className="px-4 py-2 border-2 border-[#2c5e1a] text-[#2c5e1a] rounded-full"
-							>
-								How it works
-							</a>
-							<a
-								href="#leaderboard"
-								className="px-4 py-2 bg-[#2c5e1a] text-white rounded-full"
-							>
-								Leaderboard
-							</a>
-						</nav>
-					</div>
-				</header>
-
 				<main className="container mx-auto p-4">
 					<section className="grid gap-6 text-center py-10">
 						<div>
